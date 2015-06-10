@@ -1,4 +1,4 @@
-PROJECT?=nineteen_proteomes
+PROJECT?=orthomcl_project
 BLASTOUT?=$(PROJECT).blastout
 INPUT_DIR?=input
 # Don't edit below this line

@@ -12,7 +12,7 @@ for var in SKIP_BLAST INPUT BLASTOUT PROJECT ; do
   # see: http://www.tldp.org/LDP/abs/html/bashver2.html
   # it looks up the variable named by $var
   if [ -n "${!var}" ] ; then
-    MAKECMD="$MAKECMD -D$var=${!var}"
+    MAKECMD="$MAKECMD $var=${!var}"
   fi
 done
 echo "Make command: $MAKECMD"
