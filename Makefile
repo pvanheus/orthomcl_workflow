@@ -2,6 +2,8 @@ PROJECT?=orthomcl_project
 BLASTOUT?=$(PROJECT).blastout
 INPUT_DIR?=input
 # Don't edit below this line
+MAKEFILE_SRC_DIR?=/cip0/research/projects/seabass/src/seabass/orthomcl
+ORTHOMCL_CONFIG_TEMPLATE?=$(MAKEFILE_SRC_DIR)/orthomcl.config.template
 OUTPUT=$(PROJECT).orthomcl
 DB_FILE=$(PROJECT).sqlite
 DB_SETTINGS_FILE=$(PROJECT).dbsettings
@@ -29,7 +31,10 @@ else
 $(error BLAST will not be run)
 endif
 
-$(ORTHOMCL_CONFIG): orthomcl.config.template
+orthomcl.config.template: $(MAKEFILE_SRC_DIR)/orthomcl.config.template
+	cp $< $@
+
+$(ORTHOMCL_CONFIG): $(ORTHOMCL_CONFIG_TEMPLATE)
 	sed "s/DB_FILE/$(DB_FILE)/" $< >$@
 
 $(DB_FILE): $(BLASTOUT) $(ORTHOMCL_CONFIG)
