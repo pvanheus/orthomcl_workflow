@@ -47,6 +47,15 @@ These can be set and passed to `qsub` with the `-v` flag as illustrated above. E
 By default the `run_orthomcl_make.sh` script uses the `Makefile` in `/cip0/research/projects/seabass/src/seabass/orthomcl` but
 this can be changed by setting the `MAKEFILE` environment variable.
 
+### Dependencies
+
+These need to be in your path. In the `run_orthomcl_make.sh` script they are added to the path using
+(SANBI specific) environment modules, but non-SANBI users will need to add them to the PATH themselves.
+
+* [MCL](http://www.micans.org/mcl/sec_description1.html)
+* The Stajich version of [OrthoMCL](http://www.micans.org/mcl/sec_description1.html)
+* Legacy [BLAST](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/LATEST/)
+
 ### TODO
 
 * Incorporate [FastOrtho](http://enews.patricbrc.org/fastortho/).
