@@ -46,3 +46,7 @@ These can be set and passed to `qsub` with the `-v` flag as illustrated above. E
 
 By default the `run_orthomcl_make.sh` script uses the `Makefile` in `/cip0/research/projects/seabass/src/seabass/orthomcl` but
 this can be changed by setting the `MAKEFILE` environment variable.
+
+### TODO
+
+* Incorporate [FastOrtho](http://enews.patricbrc.org/fastortho/).
