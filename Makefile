@@ -28,7 +28,7 @@ ifndef SKIP_BLAST
 $(BLASTOUT): all.fasta all.fasta.phr 
 	blastall -i $< -d $< -o $@ -p blastp -F 'm S' -v 100000 -b 100000 -e 1e-5 -m 8 
 else
-$(error BLAST will not be run)
+$(info BLAST will not be run)
 endif
 
 orthomcl.config.template: $(MAKEFILE_SRC_DIR)/orthomcl.config.template
