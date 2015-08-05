@@ -13,8 +13,9 @@ def group_frequencies(group_id, members, project, species_position, writer):
         totals[species_position[member.species.tag]] += 1
     row = [group_id]
     row.extend(totals)
-    if totals[0] > 0:
-        writer.writerow(row)
+    # if totals[0] > 0:
+    #     print row
+    #     writer.writerow(row)
 
 
 @click.command()
