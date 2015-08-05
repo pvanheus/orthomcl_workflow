@@ -28,15 +28,20 @@ class ProjectInfo(object):
         project_config = yaml.load(config_file)
         self.name = project_config['name']
         for species in project_config['species_list']:
-            species_obj = Species(species['tag'], species['common_name'])
+            species_obj = Species(species['tag'],
+                                  species['common_name'],
+                                  species['genus'],
+                                  species['species'])
             self.add_species(species_obj)
 
 
 class Species(object):
 
-    def __init__(self, tag, common_name):
+    def __init__(self, tag, common_name, genus, species):
         self.tag = tag
         self.common_name = common_name
+        self.genus = genus
+        self.species = species
         self.filename = None
         self._open = False
 
@@ -116,6 +121,35 @@ def parse_orthomcl(line, project):
     return(group_id, members)
 
 
+def group_to_fasta(group_id, members, project, input_directory, output_directory):
+    output_filename = os.path.join(output_directory, group_id + '.fasta')
+    sequence_collection = []
+    for member in members:
+        species = project.species_by_tag(member.tag)
+        if not species.is_open():
+            ok = member.species.find_and_open(input_directory)
+            if not ok:
+                sys.exit("Failed to open sequence file {}".format(species.get_filename(input_directory)))
+        try:
+            sequence_record = species[member.id]
+        except KeyError:
+            sys.exit("Failed to find {} for {}".format(member.id, species))
+        sequence_collection.append(sequence_record)
+    SeqIO.write(sequence_collection, output_filename, 'fasta')
+
+
+def process_orthomcl(orthomcl_file, project, fastortho, worker_func, *args):
+    with orthomcl_file:
+        for line in orthomcl_file:
+            if fastortho and not line.startswith('ORTHOMCL'):
+                sys.exit("Format error: FastOrtho groups are expected to start with ORTHOMCL")
+            if fastortho:
+                (group_id, members) = parse_fastortho(line, project, one_based=True)
+            else:
+                (group_id, members) = parse_orthomcl(line, project)
+            worker_func(group_id, members, project, *args)
+
+
 @click.command()
 @click.option('--fastortho/--no-fastortho', default=True)
 @click.argument('project_file', type=click.File())
@@ -127,25 +161,7 @@ def orthomcl_to_fasta(project_file, orthomcl_file, input_directory, output_direc
     project.config_from_file(project_file)
     if not os.path.exists(output_directory):
         os.mkdir(output_directory)
-    with orthomcl_file:
-        for line in orthomcl_file:
-            if fastortho and not line.startswith('ORTHOMCL'):
-                sys.exit("Format error: FastOrtho groups are expected to start with ORTHOMCL")
-            if fastortho:
-                (group_id, members) = parse_fastortho(line, project, one_based=True)
-            else:
-                (group_id, members) = parse_orthomcl(line, project)
-            output_filename = os.path.join(output_directory, group_id + '.fasta')
-            sequence_collection = []
-            for member in members:
-                species = project.species_by_tag(member.tag)
-                if not species.is_open():
-                    ok = member.species.find_and_open(input_directory)
-                    if not ok:
-                        sys.exit("Failed to open sequence file {}".format(species.get_filename(input_directory)))
-                sequence_record = species[member.id]
-                sequence_collection.append(sequence_record)
-            SeqIO.write(sequence_collection, output_filename, 'fasta')
+    process_orthomcl(orthomcl_file, project, fastortho, group_to_fasta, input_directory, output_directory)
 
 if __name__ == '__main__':
     orthomcl_to_fasta()
